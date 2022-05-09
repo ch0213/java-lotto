@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Lottos {
-    private static final int WINNER_BOUNDARY = 3;
     private final List<Lotto> lottos = new ArrayList<>();
 
     public int generateLottosFromStrategy(GenerateNumberStrategy strategy, int count) {
@@ -20,19 +19,18 @@ public class Lottos {
         return lottos.size();
     }
 
-    public Map<Ranking, Integer> countWinningLotto(Lotto winningLotto) {
+    public Map<Ranking, Integer> countWinningLotto(Lotto winningLotto, LottoNumber bonus) {
         Map<Ranking, Integer> winningLottoMap = new HashMap<>();
-        lottos.stream().map(lotto -> lotto.countMatchNumber(winningLotto))
-                .forEach(count -> saveWinner(winningLottoMap, count));
+        lottos.stream().map(lotto -> lotto.countMatchNumber(winningLotto, bonus))
+                .forEach(matchResult -> saveWinner(winningLottoMap, matchResult));
         putDefaultValueToWinningMap(winningLottoMap);
         return winningLottoMap;
     }
 
-    private void saveWinner(Map<Ranking, Integer> winningLottoMap, Integer count) {
-        if (count >= WINNER_BOUNDARY) {
-            Ranking ranking = Ranking.findMatchRanking(count);
+    private void saveWinner(Map<Ranking, Integer> winningLottoMap, MatchResult matchResult) {
+        Ranking ranking = Ranking.findMatchRanking(matchResult);
+        if (ranking.isWinner())
             winningLottoMap.put(ranking, winningLottoMap.getOrDefault(ranking, 0) + 1);
-        }
     }
 
     private void putDefaultValueToWinningMap(Map<Ranking, Integer> winningLottoMap) {
